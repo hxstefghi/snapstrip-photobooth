@@ -14,6 +14,7 @@ export default function Photobooth() {
   const [brightness, setBrightness] = useState(1)
   const [cameraError, setCameraError] = useState(null)
   const [isCapturing, setIsCapturing] = useState(false)
+  const [isMirrored, setIsMirrored] = useState(true)
 
   const filters = [
     { name: 'None', value: 'none', style: '' },
@@ -79,6 +80,12 @@ export default function Photobooth() {
       ctx.filter = filterStyle || ''
     }
     
+    // Mirror the image if mirror mode is on
+    if (isMirrored) {
+      ctx.translate(canvas.width, 0)
+      ctx.scale(-1, 1)
+    }
+    
     ctx.drawImage(videoRef.current, 0, 0)
     const photoData = canvas.toDataURL('image/jpeg', 0.9)
     setPhotos(prev => [...prev, photoData])
@@ -135,24 +142,23 @@ export default function Photobooth() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-orange-100 via-pink-50 to-blue-100 p-4 md:p-8">
+    <div className="min-h-screen bg-white p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <Link to="/" className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <div className="flex justify-between items-center mb-4 sm:mb-8">
+          <Link to="/" className="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Back
           </Link>
-          <h1 className="text-2xl font-bold" style={{fontFamily: '"Playfair Display", serif'}}>SnapStrip</h1>
-          <div className="w-16"></div>
+          <h1 className="text-lg sm:text-xl font-normal tracking-tight text-gray-900" style={{fontFamily: '"Playfair Display", serif'}}>SnapStrip</h1>
+          <div className="w-5 sm:w-6"></div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
           {/* Camera Preview */}
-          <div className="md:col-span-2 bg-white rounded-3xl p-6 shadow-lg">
-            <div className="relative aspect-4/3 max-w-2xl mx-auto bg-black rounded-2xl overflow-hidden mb-4">
+          <div className="md:col-span-2 bg-gray-50 rounded-xl sm:rounded-2xl p-3 sm:p-6 border border-gray-100">
+            <div className="relative aspect-4/3 max-w-2xl mx-auto bg-black rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4">
               {cameraError ? (
                 <div className="absolute inset-0 flex items-center justify-center text-white text-center p-4">
                   <div>
@@ -170,7 +176,7 @@ export default function Photobooth() {
                     playsInline 
                     muted
                     className="w-full h-full object-cover"
-                    style={{ filter: getFilterStyle() }}
+                    style={{ filter: getFilterStyle(), transform: isMirrored ? 'scaleX(-1)' : 'none' }}
                   />
                   {countdown !== null && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/30">
@@ -184,24 +190,35 @@ export default function Photobooth() {
             {/* Controls */}
             <div className="space-y-4">
               {/* Capture Mode & Timer */}
-              <div className="flex gap-4 items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 items-stretch sm:items-center justify-between">
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsAutoCapture(!isAutoCapture)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                    className={`flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
                       isAutoCapture ? 'bg-black text-white' : 'bg-gray-200 text-gray-700'
                     }`}
                   >
-                    {isAutoCapture ? 'Auto Capture' : 'Manual Capture'}
+                    {isAutoCapture ? 'Auto' : 'Manual'}
+                  </button>
+                  <button
+                    onClick={() => setIsMirrored(!isMirrored)}
+                    className={`px-3 sm:px-4 py-2 rounded-full text-xs sm:text-sm font-medium transition-colors ${
+                      isMirrored ? 'bg-black text-white' : 'bg-gray-200 text-gray-700'
+                    }`}
+                    title={isMirrored ? 'Mirror On' : 'Mirror Off'}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
                   </button>
                 </div>
                 
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Timer:</span>
+                  <span className="text-xs sm:text-sm text-gray-600">Timer:</span>
                   <select 
                     value={timer} 
                     onChange={(e) => setTimer(Number(e.target.value))}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none"
+                    className="flex-1 sm:flex-none px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none"
                   >
                     <option value={0}>No Timer</option>
                     <option value={3}>3s</option>
@@ -277,17 +294,18 @@ export default function Photobooth() {
                 <button
                   onClick={handleCapture}
                   disabled={countdown !== null || cameraError}
-                  className="w-full bg-black text-white py-4 rounded-full font-medium text-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full bg-black text-white py-3 sm:py-4 rounded-full font-medium text-base sm:text-lg hover:bg-gray-800 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {countdown !== null ? (
                     `Capturing in ${countdown}...`
                   ) : (
                     <>
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <circle cx="12" cy="12" r="10" strokeWidth="2" />
                         <circle cx="12" cy="12" r="3" fill="currentColor" />
                       </svg>
-                      Capture Photo ({photos.length}/4)
+                      <span className="hidden sm:inline">Capture Photo ({photos.length}/4)</span>
+                      <span className="sm:hidden">Capture ({photos.length}/4)</span>
                     </>
                   )}
                 </button>
@@ -296,13 +314,13 @@ export default function Photobooth() {
           </div>
 
           {/* Photo Preview Panel */}
-          <div className="space-y-2">
+          <div className="flex md:flex-col gap-2 overflow-x-auto md:overflow-x-visible pb-2 md:pb-0">
             {photos.map((photo, index) => (
-              <div key={index} className="relative rounded-lg overflow-hidden group" style={{width: '213.33px', height: '160px'}}>
+              <div key={index} className="relative rounded-lg overflow-hidden group flex-shrink-0" style={{ width: '160px', height: '120px' }}>
                 <img src={photo} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
                 <button
                   onClick={() => deletePhoto(index)}
-                  className="absolute top-2 right-2 bg-white/80 text-gray-700 rounded-full p-1 hover:bg-white hover:text-black transition-all opacity-0 group-hover:opacity-100"
+                  className="absolute top-2 right-2 bg-white/80 text-gray-700 rounded-full p-1.5 hover:bg-white hover:text-black transition-all opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 >
                   <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth="2.5">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />

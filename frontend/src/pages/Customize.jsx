@@ -33,7 +33,7 @@ export default function Customize() {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
     
-    // Custom photo strip size: 880x2828 pixels
+    // Custom photo strip size: 880x2828 pixels (matching preview ratio)
     canvas.width = 880
     canvas.height = 2828
     
@@ -41,15 +41,15 @@ export default function Customize() {
     ctx.fillStyle = frameColor
     ctx.fillRect(0, 0, canvas.width, canvas.height)
     
-    const padding = 50
-    const cornerRadius = roundedCorners ? 40 : 15
+    const padding = 55 // Tighter padding
+    const cornerRadius = roundedCorners ? 45 : 20 // Scaled proportionally
     
     let yPosition = padding
     
     // Calculate photo dimensions (4:3 aspect ratio to match preview)
     const photoWidth = canvas.width - (padding * 2)
     const photoHeight = (photoWidth * 3) / 4
-    const spacing = 25
+    const spacing = 28 // Tighter spacing between photos
     
     // Load all images first
     const loadedImages = await Promise.all(
@@ -112,30 +112,28 @@ export default function Customize() {
       yPosition += photoHeight + spacing
     })
     
-    // Draw branding
-    yPosition += 30
-    ctx.fillStyle = whiteText ? '#ffffff' : '#1f2937'
-    ctx.font = 'bold 50px Arial'
+    // Draw branding - closer to photos with minimal spacing
+    yPosition += 65
+    ctx.fillStyle = whiteText ? '#ffffff' : '#000000'
+    ctx.font = '900 68px "Playfair Display", serif'
     ctx.textAlign = 'center'
     ctx.fillText('SnapStrip', canvas.width / 2, yPosition)
-    yPosition += 90 // Increased spacing after SnapStrip
     
-    // Draw custom text if exists (below branding)
+    // Draw custom text if exists - very close spacing to SnapStrip
     if (customText.trim()) {
-      ctx.fillStyle = whiteText ? '#ffffff' : '#1f2937'
-      ctx.font = 'bold 52px Arial'
+      yPosition += 65
+      ctx.fillStyle = whiteText ? '#ffffff' : '#000000'
+      ctx.font = '58px "Playfair Display", serif'
       ctx.textAlign = 'center'
       ctx.fillText(customText, canvas.width / 2, yPosition)
-      yPosition += 75 // Increased spacing after custom text
     }
     
-    // Draw date if enabled (below custom text)
+    // Draw date at bottom if enabled - much closer to bottom edge
     if (showDate) {
-      ctx.fillStyle = whiteText ? '#ffffff' : '#1f2937'
-      ctx.font = 'bold 40px Arial'
+      ctx.fillStyle = whiteText ? '#ffffff' : '#000000'
+      ctx.font = '48px "Playfair Display", serif'
       ctx.textAlign = 'center'
-      ctx.fillText(getCurrentDate(), canvas.width / 2, yPosition)
-      yPosition += 50 // Add margin bottom for date
+      ctx.fillText(getCurrentDate(), canvas.width / 2, canvas.height - 90)
     }
     
     // Download
@@ -150,33 +148,32 @@ export default function Customize() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-orange-100 via-pink-50 to-blue-100 p-4 md:p-8">
+    <div className="min-h-screen bg-white p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <Link to="/photobooth" className="text-gray-600 hover:text-gray-900 flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <div className="flex justify-between items-center mb-4 sm:mb-8">
+          <Link to="/photobooth" className="text-gray-400 hover:text-gray-600 transition-colors">
+            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
             </svg>
-            Back
           </Link>
-          <h1 className="text-2xl font-bold" style={{fontFamily: '"Playfair Display", serif'}}>Customize Your Strip</h1>
-          <div className="w-16"></div>
+          <h1 className="text-lg sm:text-xl font-normal tracking-tight text-gray-900" style={{fontFamily: '"Playfair Display", serif'}}>Customize</h1>
+          <div className="w-5 sm:w-6"></div>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           {/* Left Side - Customization Options */}
-          <div className="bg-white rounded-3xl p-6 shadow-lg space-y-6">
-            <h2 className="text-xl font-semibold mb-4">Customize</h2>
+          <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100 space-y-4 sm:space-y-6">
+            <h2 className="text-base sm:text-lg font-normal text-gray-900 mb-3 sm:mb-4">Options</h2>
 
             {/* Custom Text */}
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-2">Custom Text or Emoji</p>
+              <p className="text-sm font-medium text-gray-700 mb-2">Add custom text or emoji</p>
               <input
                 type="text"
                 value={customText}
                 onChange={(e) => setCustomText(e.target.value)}
-                placeholder="Add text or emoji... 🎉"
+                
                 maxLength={30}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-black focus:border-transparent outline-none"
               />
@@ -185,22 +182,19 @@ export default function Customize() {
 
             {/* Frame Color */}
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-3">Frame Color</p>
+              <p className="text-sm font-medium text-gray-700 mb-3">Frame color</p>
               <div className="grid grid-cols-3 gap-2 mb-3">
                 {presetColors.map((color) => (
                   <button
                     key={color.value}
                     onClick={() => setFrameColor(color.value)}
-                    className={`px-4 py-2 rounded-lg text-xs font-medium transition-all border-2 ${
+                    className={`px-6 py-4 rounded-lg font-medium transition-all border-2 ${
                       frameColor === color.value
                         ? 'border-black scale-105'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                     style={{ backgroundColor: color.value }}
                   >
-                    <span className={color.value === '#ffffff' || color.value === '#ffffe0' ? 'text-gray-700' : 'text-white'}>
-                      {color.name}
-                    </span>
                   </button>
                 ))}
               </div>
@@ -219,7 +213,7 @@ export default function Customize() {
             {/* Toggle Options */}
             <div className="space-y-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Show Date</span>
+                <span className="text-sm font-medium text-gray-700">Show date</span>
                 <button
                   onClick={() => setShowDate(!showDate)}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
@@ -235,7 +229,7 @@ export default function Customize() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">Rounded Corners</span>
+                <span className="text-sm font-medium text-gray-700">Rounded corners</span>
                 <button
                   onClick={() => setRoundedCorners(!roundedCorners)}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
@@ -251,7 +245,7 @@ export default function Customize() {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-700">White Text</span>
+                <span className="text-sm font-medium text-gray-700">White text</span>
                 <button
                   onClick={() => setWhiteText(!whiteText)}
                   className={`w-12 h-6 rounded-full transition-colors relative ${
@@ -282,11 +276,11 @@ export default function Customize() {
           </div>
 
           {/* Right Side - Preview */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center mt-6 md:mt-0">
             {/* Photo Strip Preview */}
             <div
               className={`relative pt-3 px-3 pb-16 shadow-2xl ${roundedCorners ? 'rounded-2xl' : 'rounded-lg'}`}
-              style={{ backgroundColor: frameColor, width: '200px' }}
+              style={{ backgroundColor: frameColor, width: '180px', maxWidth: '100%' }}
             >
               <div className="space-y-1.5">
                 {photos.map((photo, index) => (
@@ -300,18 +294,18 @@ export default function Customize() {
                 ))}
               </div>
 
-              <div className={`text-center mt-2 font-medium ${whiteText ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: '9px' }}>
+              <div className={`text-center mt-3 font-bold ${whiteText ? 'text-white' : 'text-black'}`} style={{ fontSize: '15px', fontFamily: '"Playfair Display", serif', fontWeight: '900' }}>
                 SnapStrip
               </div>
               
               {customText.trim() && (
-                <div className={`text-center mt-3 font-medium ${whiteText ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: '11px' }}>
+                <div className={`text-center mt-1.5 ${whiteText ? 'text-white' : 'text-black'}`} style={{ fontSize: '13px', fontFamily: '"Playfair Display", serif' }}>
                   {customText}
                 </div>
               )}
               
               {showDate && (
-                <div className={`text-center font-medium ${whiteText ? 'text-white' : 'text-gray-800'}`} style={{ fontSize: '9px', position: 'absolute', bottom: '24px', left: 0, right: 0 }}>
+                <div className={`text-center ${whiteText ? 'text-white' : 'text-black'}`} style={{ fontSize: '10.5px', fontFamily: '"Playfair Display", serif', position: 'absolute', bottom: '18px', left: 0, right: 0 }}>
                   {getCurrentDate()}
                 </div>
               )}
