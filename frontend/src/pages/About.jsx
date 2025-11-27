@@ -23,8 +23,11 @@ export default function About() {
           <p className="mb-3">
             I’ve always enjoyed the charm of photobooths, they freeze little moments in the best way. Since they’re not always easy to access, I built SnapStrip, a personal project, so you can enjoy that photobooth vibe anytime you want.
           </p>
-          <p className='mb-6'>
+          <p className='mb-3'>
             This app brings back the classic photo strip style: stacked shots, simple text, and an easy download. Whether you’re being silly, sweet, or just capturing a moment, SnapStrip lets you create that nostalgic strip right from your browser.
+          </p>
+          <p className='mb-6'>
+            Developed by: Christian Catuday
           </p>
         </div>
 
