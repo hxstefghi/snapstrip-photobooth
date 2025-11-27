@@ -30,10 +30,6 @@ export default function Privacy() {
               If you have any questions, feel free to message me anytime.
             </p>
           </div>
-
-          <p className="pt-6 text-xs text-gray-400" style={{fontFamily: 'monospace'}}>
-            Last updated: November 2025
-          </p>
         </div>
       </div>
     </div>
