@@ -112,14 +112,7 @@ export default function Customize() {
       yPosition += photoHeight + spacing
     })
     
-    // Draw branding - closer to photos with minimal spacing
-    yPosition += 65
-    ctx.fillStyle = whiteText ? '#ffffff' : '#000000'
-    ctx.font = '900 68px "Playfair Display", serif'
-    ctx.textAlign = 'center'
-    ctx.fillText('SnapStrip', canvas.width / 2, yPosition)
-    
-    // Draw custom text if exists - very close spacing to SnapStrip
+    // Draw custom text if exists
     if (customText.trim()) {
       yPosition += 65
       ctx.fillStyle = whiteText ? '#ffffff' : '#000000'
@@ -292,10 +285,6 @@ export default function Customize() {
                     <img src={photo} alt={`Photo ${index + 1}`} className="w-full h-full object-cover" />
                   </div>
                 ))}
-              </div>
-
-              <div className={`text-center mt-3 font-bold ${whiteText ? 'text-white' : 'text-black'}`} style={{ fontSize: '15px', fontFamily: '"Playfair Display", serif', fontWeight: '900' }}>
-                SnapStrip
               </div>
               
               {customText.trim() && (
